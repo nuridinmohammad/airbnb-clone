@@ -1,14 +1,14 @@
+import Colors from '@/constants/Colors';
+import { Link } from 'expo-router';
+import { Text, View } from 'react-native';
 import { StyleSheet } from 'react-native';
 
-import EditScreenInfo from '../../components/EditScreenInfo';
-import { Text, View } from '../../components/Themed';
-
-export default function TabOneScreen() {
+export default function TabTwoScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One TESddddT</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <Link style={styles.title} href={'/(modals)/login'}>Login</Link>
+      <Link style={styles.title} href={'/(modals)/booking'}>Bookings</Link>
+      <Link style={styles.title} href={'/listing/323'}>Listings</Link>
     </View>
   );
 }
@@ -16,8 +16,6 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   title: {
     fontSize: 20,

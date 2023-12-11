@@ -2,14 +2,14 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import Colors from "../../constants/Colors";
+import Colors from "@/constants/Colors";
 
 const TAB_ITEM = [
-  { title: "Home", icon: "home", name: "home" },
-  { title: "Explore", icon: "compass", name: "explore" },
+  { title: "Explore", icon: "search", name: "index" },
+  { title: "Wishlist", icon: "heart", name: "wishlist" },
+  { title: "Trip", icon: "md-navigate-circle", name: "trip" },
+  { title: "Inbox", icon: "chatbubble-ellipses", name: "inbox" },
   { title: "Profile", icon: "person-circle", name: "profile" },
-
-  
 ];
 
 type TabItemType = {
@@ -20,27 +20,29 @@ type TabItemType = {
 
 const Layout = () => {
   return (
-    <Tabs>
-      {TAB_ITEM.map((item:TabItemType) => (
+    <Tabs screenOptions={{
+      tabBarActiveTintColor:Colors.primary 
+    }}>
+      {TAB_ITEM.map((item: TabItemType) => (
         <Tabs.Screen
-        name={item.name}
-        options={{
-          title: item.title,
-          headerTintColor: "#fff",
-          headerTitleStyle: {
-            fontWeight: "bold",
-          },
-          tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={
-                focused ? item.icon : `${item.icon}-outline`
-              } // Specify the icon name
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
+        key={item.name}
+          name={item.name}
+          
+          options={{
+            headerTitleStyle: {
+              fontWeight: "bold",
+            },
+            // tabBarLabel:item.title,
+            title: item.title,
+            tabBarIcon: ({ focused, color, size }) => (
+              <Ionicons
+                name={focused ? item.icon : `${item.icon}-outline`} // Specify the icon name
+                size={size}
+                color={color}
+              />
+            ),
+          }}
+        />
       ))}
     </Tabs>
   );
