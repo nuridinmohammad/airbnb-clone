@@ -1,35 +1,44 @@
+import { useFonts } from "expo-font";
+import { SplashScreen, Stack, useRouter } from "expo-router";
+import { useEffect } from "react";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import * as SecureStore from "expo-secure-store";
 import { Ionicons } from "@expo/vector-icons";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { TouchableOpacity, useColorScheme } from "react-native";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { useFonts } from "expo-font";
-import { SplashScreen, Stack, useRouter } from "expo-router";
-import { useEffect } from "react";
-import { TouchableOpacity, useColorScheme } from "react-native";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
+const CLERK_PUBLISHABLE_KEY =
+  "pk_test_dXB3YXJkLWNoaXBtdW5rLTU1LmNsZXJrLmFjY291bnRzLmRldiQ";
+const tokenCache = {
+  async getToken(key: string) {
+    try {
+      return SecureStore.getItemAsync(key);
+    } catch (err) {
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string) {
+    try {
+      return SecureStore.setItemAsync(key, value);
+    } catch (err) {
+      return;
+    }
+  },
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/Montserrat-Regular.ttf"),
-    ...FontAwesome.font,
+    mon: require("../assets/fonts/Montserrat-Regular.ttf"),
+    "mon-sb": require("../assets/fonts/Montserrat-SemiBold.ttf"),
+    "mon-b": require("../assets/fonts/Montserrat-Bold.ttf"),
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -44,12 +53,28 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <ClerkProvider
+      publishableKey={CLERK_PUBLISHABLE_KEY!}
+      tokenCache={tokenCache}
+    >
+      <RootLayoutNav />
+    </ClerkProvider>
+  );
 }
 
 function RootLayoutNav() {
+  const { isLoaded, isSignedIn,sessionId } = useAuth();
   const colorScheme = useColorScheme();
+
   const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn && !sessionId) {
+      router.push("/(modals)/login");
+    }
+  }, [isLoaded, sessionId]);
+
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
@@ -57,7 +82,7 @@ function RootLayoutNav() {
         <Stack.Screen
           name="(modals)/login"
           options={{
-            animation:"slide_from_bottom",
+            animation: "slide_from_bottom",
             presentation: "modal",
             title: "Log in or Sign up",
             headerLeft: () => (
@@ -71,7 +96,7 @@ function RootLayoutNav() {
           name="(modals)/booking"
           options={{
             presentation: "transparentModal",
-            animation:"fade",
+            animation: "fade",
             title: "Bookings",
             headerLeft: () => (
               <TouchableOpacity onPress={() => router.back()}>
@@ -84,7 +109,7 @@ function RootLayoutNav() {
           name="listing/[id]"
           options={{
             presentation: "modal",
-            animation:"slide_from_right",
+            animation: "slide_from_right",
             title: "Listings",
             headerLeft: () => (
               <TouchableOpacity onPress={() => router.back()}>
