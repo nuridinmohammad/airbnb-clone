@@ -1,29 +1,33 @@
-import Colors from '@/constants/Colors';
-import { Link } from 'expo-router';
-import { Text, View } from 'react-native';
-import { StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import ListingsBottomSheet from '@/components/ListingsBottomSheet';
+import listingsData from '@/assets/data/airbnb-listings.json';
+import ListingsMap from '@/components/ListingsMap';
+import listingsDataGeo from '@/assets/data/airbnb-listings.geo.json';
+import { Stack } from 'expo-router';
+import ExploreHeader from '@/components/ExploreHeader';
 
-export default function TabTwoScreen() {
+const Page = () => {
+  const items = useMemo(() => listingsData as any, []);
+  const getoItems = useMemo(() => listingsDataGeo, []);
+  const [category, setCategory] = useState<string>('Tiny homes');
+
+  const onDataChanged = (category: string) => {
+    setCategory(category);
+  };
+
   return (
-    <View style={styles.container}>
-      <Link style={styles.title} href={'/(modals)/login'}>Login</Link>
-      <Link style={styles.title} href={'/(modals)/booking'}>Bookings</Link>
-      <Link style={styles.title} href={'/listing/323'}>Listings</Link>
+    <View style={{ flex: 1, marginTop: 110 }}>
+      {/* Define pour custom header */}
+      <Stack.Screen
+        options={{
+          header: () => <ExploreHeader onCategoryChanged={onDataChanged} />,
+        }}
+      />
+      <ListingsMap listings={getoItems} />
+      <ListingsBottomSheet listings={items} category={category} />
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
+export default Page;
